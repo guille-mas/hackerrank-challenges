@@ -1,4 +1,4 @@
-;(()=>{
+let myTrie = (()=>{
     "use strict";
 
     /**
@@ -73,15 +73,22 @@
 
     var t = new Trie('');
 
+    return t;
+})();
+
+
+function test(t){
+    "use strict";
+
     //add hack
     t.addWord('hack');
     //add hackerrank
     t.addWord('hackerrank');
     //find hac
-    console.log(t.countWordsWithPrefix('hac'));
+    console.log(t.countWordsWithPrefix('hac'));         // 2
     //find hak
-    console.log(t.countWordsWithPrefix('hak'));
-    console.log(t.countWordsWithPrefix('f'));
+    console.log(t.countWordsWithPrefix('hak'));         // 0
+    console.log(t.countWordsWithPrefix('f'));           // 0
     t.addWord('hack');
     t.addWord('hacer');
     t.addWord('haz');
@@ -89,8 +96,10 @@
     t.addWord('hack');
     console.log(t.countWordsWithPrefix('a'));           // 0
     console.log(t.countWordsWithPrefix('h'));           // 5
-    console.log(t.countWordsWithPrefix('hac'));         // 2
-    console.log(t.countWordsWithPrefix('ha'));          // 3
+    console.log(t.countWordsWithPrefix('hac'));         // 3
+    console.log(t.countWordsWithPrefix('ha'));          // 4
     console.log(t.countWordsWithPrefix('hak'));         // 0
+}
 
-})();
+
+test(myTrie);
