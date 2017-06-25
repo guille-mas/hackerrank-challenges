@@ -9,6 +9,7 @@ let myTrie = (()=>{
         this.childs = {};
         this.data = char;
         this.endOfWord = false;
+        this.suffixCounter = 0;
     };
 
 
@@ -18,10 +19,15 @@ let myTrie = (()=>{
      */
     Trie.prototype.addWord = function(word) {
         if(!word.length){
-            return;
+            // this.suffixCounter = this.endOfWord ? 1 : 0;
+            return 0;
         }else if(word.length === 1) {
             this.data = word;
-            this.endOfWord = true;
+            if(!this.endOfWord){
+                this.endOfWord = true;
+                this.suffixCounter++;
+            }
+            return this.suffixCounter;
         } else {
             let firstChar = word[0];
             let nextChar = word[1];
@@ -30,13 +36,14 @@ let myTrie = (()=>{
             if(this.data == null){
                 this.data = firstChar;
                 this.childs[nextChar] = new Trie(nextChar);
-                this.childs[nextChar].addWord(suffix);
             }else{
                 if(typeof this.childs[nextChar] == 'undefined') {
                     this.childs[nextChar] = new Trie(nextChar);
                 }
-                this.childs[nextChar].addWord(suffix);
             }
+
+            this.suffixCounter = this.childs[nextChar].addWord(suffix) + ( this.endOfWord ? 1 : 0);
+            return this.suffixCounter;
         }
     };
 
@@ -46,31 +53,23 @@ let myTrie = (()=>{
      * @param word
      */
     Trie.prototype.countWordsWithPrefix = function(word) {
-        word = word || '';
-        let prefixCount = this.endOfWord ? 1 : 0;
-        let suffix = word.substr(1);
-
-        if(word.length) {
-            if(suffix.length) {
-                let nextChar = word[1];
-                if(typeof this.childs[nextChar] != 'undefined'){
-                    return prefixCount + this.childs[nextChar].countWordsWithPrefix(suffix);
-                }else{
-                    return prefixCount;
-                }
-            }else if(word[0] != this.data){
+        if(!word.length){
+            return 0;
+        }else{
+            if(word[0] != this.data){
                 return 0;
+            }else if(word.length === 1){
+                return this.suffixCounter;
+            }else{
+                if(typeof this.childs[word[1]] != 'undefined'){
+                    return this.childs[word[1]].countWordsWithPrefix(word.substr(1));
+                }else{
+                    return 0;
+                }
             }
         }
-
-        let childLetters = Object.getOwnPropertyNames(this.childs);
-        for(let i=0; i<childLetters.length; i++){
-            prefixCount += this.childs[childLetters[i]].countWordsWithPrefix(suffix);
-        }
-        return prefixCount;
     };
-
-
+    
     var t = new Trie('');
 
     return t;
@@ -101,5 +100,18 @@ function test(t){
     console.log(t.countWordsWithPrefix('hak'));         // 0
 }
 
+
+
+function test2(t){
+    "use strict";
+    t.addWord('hacer');
+    t.addWord('hace');
+    t.addWord('hacerese');
+    console.log(t.countWordsWithPrefix('a'));        // 0
+    console.log(t.countWordsWithPrefix('h'));        // 3
+    console.log(t.countWordsWithPrefix('hacer'));    // 2
+    console.log(t.countWordsWithPrefix('hacere'));   // 1
+
+}
 
 test(myTrie);
