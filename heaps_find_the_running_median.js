@@ -1,131 +1,257 @@
-let MinHeap = (()=>{
+let Solution = (()=>{
     "use strict";
 
-    var that;
+    class AbstractHeap {
+        
+        constructor() {
+            this.data = [];
+        }
 
-    function MinHeap(){
-        this.data = [];
-        that = this;
+        add(item) {
+            // push element to next empty position
+            this.data.push(item);
+            // bubble up the element until finding its place
+            this._bubbleUp(this.count()-1);
+        }
+
+        poll() {
+            let removedItem = this.data.shift();
+            this.data.unshift(this.data.pop());
+            this._bubbleDown(0);
+            return removedItem;
+        }
+
+        peek() {
+            return this.data[0];
+        }
+
+        isEmpty() {
+            return this.data.length === 0;
+        }
+
+        count() {
+            return this.data.length;
+        }
+
+        /**
+         * Given two indexes, swap the elements on those positions
+         * @param idx1
+         * @param idx2
+         */
+        _swapItems(idx1, idx2) {
+            var tmp = this.data[idx1];
+            this.data[idx1] = this.data[idx2];
+            this.data[idx2] = tmp;
+        }
+
+        /**
+         * Given an index, return the parent index
+         * @param index
+         */
+        _getParentIdx(index) {
+            return Number.parseInt(Math.round((index-1)/2));
+        }
+
+        /**
+         * Given an index, return the left child index
+         * @param index
+         */
+        _getLeftChildIdx(index) {
+            return Number.parseInt(Math.round(2*index+1));
+        }
+
+        /**
+         * Given an index, return the right child index
+         * @param index
+         */
+        _getRightChildIdx(index) {
+            return Number.parseInt(Math.round(2*index+2));
+        }
+
+        _hasLeftChild(idx) {
+            return typeof this.data[this._getLeftChildIdx(idx)] == 'number';
+        }
+
+        _hasRightChild(idx) {
+            return typeof this.data[this._getRightChildIdx(idx)] == 'number';
+        }
+
+        /**
+         * Given an index, bubble up the item on that position
+         * til we find its place on the heap
+         * @param idx
+         */
+        _bubbleUp(idx) {
+            let parentIdx = this._getParentIdx(idx);
+            if(parentIdx >= 0
+                && this._compareItems(this.data[idx] , this.data[parentIdx])) {
+                this._swapItems(idx,parentIdx);
+                this._bubbleUp(parentIdx);
+            }
+        }
     }
 
-    /**
-     * Add an element and print the medium item on a new line
-     * @param item
-     */
-    MinHeap.prototype.add = function(item){
-        // push element to next empty position
-        this.data.push(item);
-        // bubble up the element until finding its place
-        bubbleUp(this.data.length-1);
-    };
 
-    /**
-     * Remove and return the minimum element
-    MinHeap.prototype.poll = function(){};
-    */
-
-    /**
-     * Return the minimum element
-    MinHeap.prototype.peek = function(){};
-    */
-
-    MinHeap.prototype.getMiddle = function(){
-        if(this.data.length%2 === 0){
-            var idx1 = this.data.length/2-1;
-            var idx2 = this.data.length/2;
-            return (( this.data[idx1] + this.data[idx2] ) / 2).toFixed(1);
-        }else{
-            return this.data[Number.parseInt(this.data.length/2)].toFixed(1);
+    class MinHeap extends AbstractHeap {
+        _compareItems(item1, item2){
+            return item1 < item2;
         }
-    };
 
-    /**
-     * Given two indexes, swap the elements on those positions
-     * @param idx1
-     * @param idx2
-     */
-    var swapItems = function(idx1, idx2){
-        var tmp = that.data[idx1];
-        that.data[idx1] = that.data[idx2];
-        that.data[idx2] = tmp;
-    };
+        /**
+         * Given an index, bubble down the item on that
+         * position til we find its place on the heap
+         * @param idx
+         */
+        _bubbleDown(idx) {
+            if(this._hasLeftChild(idx)) {
+                let currentItem = this.data[idx];
+                let leftChild = this.data[this._getLeftChildIdx(idx)];
 
-    /**
-     * Given an index, return the parent index
-     * @param index
-     */
-    var getParentIdx = function(index){
-        return Number.parseInt(Math.round((index-1)/2));
-    };
+                if(this._hasRightChild(idx)) {
+                    let rightChild = this.data[this._getRightChildIdx(idx)];
+                    if(rightChild < leftChild) {
+                        if(rightChild < currentItem) {
+                            this._swapItems(idx,this._getRightChildIdx(idx));
+                            return this._bubbleDown(this._getRightChildIdx(idx));
+                        }
+                    }
+                }
 
-    /**
-     * Given an index, return the left child index
-     * @param index
-    var getLeftChildIdx = function(index){
-        return Number.parseInt(2*index + 1);
-    };
-    */
-
-
-    /**
-     * Given an index, return the right child index
-     * @param index
-    var getRightChildIdx = function(index){
-        return Number.parseInt(2*index + 2);
-    };
-    */
-
-    /**
-     * Given an index, bubble up the item on that position
-     * til we find its place on the heap
-     * @param idx
-     */
-    var bubbleUp = function(idx){
-        let parentIdx = getParentIdx(idx);
-        if(parentIdx < 0 || idx === 0){
-            return;
-        }else if(that.data[idx] < that.data[parentIdx]){
-            swapItems(idx,parentIdx);
-            bubbleUp(parentIdx);
+                if(leftChild < currentItem) {
+                    this._swapItems(idx,this._getLeftChildIdx(idx));
+                    return this._bubbleDown(this._getLeftChildIdx(idx));
+                }
+            }
         }
-    };
+    }
 
-    return MinHeap;
+
+
+
+    class MaxHeap extends AbstractHeap {
+        _compareItems(item1, item2){
+            return item1 > item2;
+        }
+
+        /**
+         * Given an index, bubble down the item on that
+         * position til we find its place on the heap
+         * @param idx
+         */
+        _bubbleDown(idx) {
+            if(this._hasLeftChild(idx)) {
+                let currentItem = this.data[idx];
+                let leftChild = this.data[this._getLeftChildIdx(idx)];
+
+                if(this._hasRightChild(idx)) {
+                    let rightChild = this.data[this._getRightChildIdx(idx)];
+                    if(rightChild > leftChild) {
+                        if(rightChild > currentItem) {
+                            this._swapItems(idx,this._getRightChildIdx(idx));
+                            return this._bubbleDown(this._getRightChildIdx(idx));
+                        }
+                    }
+                }
+
+                if(leftChild > currentItem) {
+                    this._swapItems(idx,this._getLeftChildIdx(idx));
+                    return this._bubbleDown(this._getLeftChildIdx(idx));
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Solution
+     * @constructor
+     */
+    class Solution {
+        constructor(){
+            this.minHeap = new MinHeap();
+            this.maxHeap = new MaxHeap();
+        }
+
+        getMiddle() {
+            let middle;
+
+            if(this.minHeap.count() === this.maxHeap.count()){
+                let highestMin = this.maxHeap.peek();
+                let lowestMax = this.minHeap.peek();
+                middle = (highestMin+lowestMax) / 2;
+            }else if(this.minHeap.count() > this.maxHeap.count()){
+                middle = this.minHeap.peek();
+            }else if(this.minHeap.count() < this.maxHeap.count()){
+                middle = this.maxHeap.peek();
+            }
+            return middle.toFixed(1);
+        }
+
+        rebalanceHeaps() {
+            if (this.minHeap.count() < this.maxHeap.count()) {
+                this.minHeap.add(this.maxHeap.poll());
+            } else {
+                this.maxHeap.add(this.minHeap.poll());
+            }
+        }
+
+        add(item) {
+            if(item >= this.minHeap.peek()){
+                this.minHeap.add(item);
+            }else{
+                this.maxHeap.add(item);
+            }
+
+            if(Math.abs(this.minHeap.count() - this.maxHeap.count()) > 1){
+                this.rebalanceHeaps();
+            }
+        }
+
+    }
+
+    return Solution;
 })();
 
 
+/////////////// ignore above this line ////////////////////
 
-// test
-var h = new MinHeap();
+let test1 = (() => {
+    var input = require("fs")
+            .readFileSync("./tests/heaps_find_the_running_median_test_1.txt", "utf-8")
+            .split("\n");
 
-h.add(12);
-// [12]
-console.assert(parseFloat(h.getMiddle()),12.0);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
+    var results = require("fs")
+            .readFileSync("./tests/heaps_find_the_running_median_test_1_results.txt", "utf-8")
+            .split("\n");
 
-h.add(4);
-// [4,12]
-console.assert(h.getMiddle(),8.0);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
+    var s = new Solution();
+    var n = input.shift();
 
-h.add(5);
-// [4,5,12]
-console.assert(h.getMiddle(),5.0);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
-
-h.add(3);
-// [3,4,5,12]
-console.assert(h.getMiddle(),4.5);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
-
-h.add(8);
-// [3,4,5,8,12]
-console.assert(h.getMiddle(),5.0);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
-
-h.add(7);
-// [3,4,5,7,8,12]
-console.assert(h.getMiddle(),6.0);
-console.log(h.getMiddle(), parseFloat(h.getMiddle()));
+    for(var a_i = 0; a_i < n; a_i++){
+        s.add(Number(input[a_i]));
 
 
+        var tmp = s.minHeap.data[0];
+        for(var i = 1; i< s.minHeap.count(); i++){
+            if(s.minHeap.data[i] < tmp){
+                throw new Error(s.minHeap.data[i]+' < '+tmp);
+            }
+        }
+
+        tmp = s.maxHeap.data[0];
+        for(var i = 1; i< s.maxHeap.count(); i++){
+            if(s.maxHeap.data[i] > tmp){
+                throw new Error(s.minHeap.data[i]+' > '+tmp);
+            }
+        }
+
+
+        try {
+            console.assert(s.getMiddle() == results[a_i], 'at position '+a_i+': '+s.getMiddle() +' != '+ results[a_i]);
+        }catch(e){
+            console.log(e.message);
+            console.log(s.getMiddle(), results[a_i]);
+            break;
+        }
+    }
+})();
