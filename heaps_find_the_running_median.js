@@ -106,6 +106,32 @@ let Solution = (()=>{
                 this._bubbleUp(parentIdx);
             }
         }
+
+        /**
+         * Given an index, bubble down the item on that
+         * position til we find its place on the heap
+         * @param idx
+         */
+        _bubbleDown() {
+            let index = 0;
+            while(this._hasLeftChild(index)) {
+                let rootCandidateIndex = this._getLeftChildIdx(index);
+
+                if( this._hasRightChild(index)
+                    && this._compareItems(this.item(this._getRightChildIdx(index)), this.item(this._getLeftChildIdx(index)))
+                ) {
+                    rootCandidateIndex = this._getRightChildIdx(index);
+                }
+
+                if(this._compareItems(this.item(index),  this.item(rootCandidateIndex))){
+                    break;
+                }
+                else {
+                    this._swapItems(index,rootCandidateIndex);
+                }
+                index = rootCandidateIndex;
+            }
+        }
     }
 
 
@@ -113,68 +139,12 @@ let Solution = (()=>{
         _compareItems(item1, item2){
             return item1 < item2;
         }
-
-        /**
-         * Given an index, bubble down the item on that
-         * position til we find its place on the heap
-         * @param idx
-         */
-        _bubbleDown() {
-            let index = 0;
-            while(this._hasLeftChild(index)) {
-                let smallerChildIndex = this._getLeftChildIdx(index);
-
-                if( this._hasRightChild(index)
-                        && this.item(this._getRightChildIdx(index)) < this.item(this._getLeftChildIdx(index))
-                ) {
-                    smallerChildIndex = this._getRightChildIdx(index);
-                }
-
-                if(this.item(index) < this.item(smallerChildIndex)) {
-                    break;
-                }
-                else {
-                    this._swapItems(index,smallerChildIndex);
-                }
-                index = smallerChildIndex;
-            }
-        }
-
-
     }
-
-
 
 
     class MaxHeap extends AbstractHeap {
         _compareItems(item1, item2){
             return item1 > item2;
-        }
-
-        /**
-         * Given an index, bubble down the item on that
-         * position til we find its place on the heap
-         * @param idx
-         */
-        _bubbleDown() {
-            let index = 0;
-            while(this._hasLeftChild(index)) {
-                let higherChildIndex = this._getLeftChildIdx(index);
-
-                if( this._hasRightChild(index)
-                    && this.item(this._getRightChildIdx(index)) > this.item(this._getLeftChildIdx(index))
-                ) {
-                    higherChildIndex = this._getRightChildIdx(index);
-                }
-
-                if(this.item(index) > this.item(higherChildIndex)) {
-                    break;
-                }
-                else {
-                    this._swapItems(index,higherChildIndex);
-                }
-                index = higherChildIndex;
-            }
         }
     }
 
