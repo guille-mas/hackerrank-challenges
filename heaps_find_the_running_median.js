@@ -7,21 +7,35 @@ let Solution = (()=>{
             this.data = [];
         }
 
+        item(idx){
+            return this.data[idx];
+        }
+
         add(item) {
             // push element to next empty position
             this.data.push(item);
             // bubble up the element until finding its place
-            this._bubbleUp(this.count()-1);
+            this._bubbleUp(this.count-1);
         }
 
         poll() {
-            let removedItem = this.data.shift();
-            this.data.unshift(this.data.pop());
-            this._bubbleDown(0);
+            let removedItem;
+            if(this.data.length <= 1){
+                removedItem = this.data[0] || null;
+                this.data = [];
+            }else{
+                // remove item from root;
+                removedItem = this.data.shift();
+                // replace root by last added item
+                this.data.unshift(this.data.pop());
+                // bubble the root down until finding its place
+                this._bubbleDown(0);
+            }
+
             return removedItem;
         }
 
-        peek() {
+        get peek() {
             return this.data[0];
         }
 
@@ -29,7 +43,7 @@ let Solution = (()=>{
             return this.data.length === 0;
         }
 
-        count() {
+        get count() {
             return this.data.length;
         }
 
@@ -46,34 +60,37 @@ let Solution = (()=>{
 
         /**
          * Given an index, return the parent index
+         * @testOk
          * @param index
          */
         _getParentIdx(index) {
-            return Number.parseInt(Math.round((index-1)/2));
+            return Number.parseInt(Math.floor((index-1)/2));
         }
 
         /**
          * Given an index, return the left child index
+         * @testOk
          * @param index
          */
         _getLeftChildIdx(index) {
-            return Number.parseInt(Math.round(2*index+1));
+            return Number.parseInt(Math.floor(2*index+1));
         }
 
         /**
          * Given an index, return the right child index
+         * @testOk
          * @param index
          */
         _getRightChildIdx(index) {
-            return Number.parseInt(Math.round(2*index+2));
+            return Number.parseInt(Math.floor(2*index+2));
         }
 
         _hasLeftChild(idx) {
-            return typeof this.data[this._getLeftChildIdx(idx)] == 'number';
+            return typeof this.item(this._getLeftChildIdx(idx)) == 'number';
         }
 
         _hasRightChild(idx) {
-            return typeof this.data[this._getRightChildIdx(idx)] == 'number';
+            return typeof this.item(this._getRightChildIdx(idx)) == 'number';
         }
 
         /**
@@ -84,7 +101,7 @@ let Solution = (()=>{
         _bubbleUp(idx) {
             let parentIdx = this._getParentIdx(idx);
             if(parentIdx >= 0
-                && this._compareItems(this.data[idx] , this.data[parentIdx])) {
+                && this._compareItems(this.item(idx) , this.item(parentIdx))) {
                 this._swapItems(idx,parentIdx);
                 this._bubbleUp(parentIdx);
             }
@@ -102,27 +119,28 @@ let Solution = (()=>{
          * position til we find its place on the heap
          * @param idx
          */
-        _bubbleDown(idx) {
-            if(this._hasLeftChild(idx)) {
-                let currentItem = this.data[idx];
-                let leftChild = this.data[this._getLeftChildIdx(idx)];
+        _bubbleDown() {
+            let index = 0;
+            while(this._hasLeftChild(index)) {
+                let smallerChildIndex = this._getLeftChildIdx(index);
 
-                if(this._hasRightChild(idx)) {
-                    let rightChild = this.data[this._getRightChildIdx(idx)];
-                    if(rightChild < leftChild) {
-                        if(rightChild < currentItem) {
-                            this._swapItems(idx,this._getRightChildIdx(idx));
-                            return this._bubbleDown(this._getRightChildIdx(idx));
-                        }
-                    }
+                if( this._hasRightChild(index)
+                        && this.item(this._getRightChildIdx(index)) < this.item(this._getLeftChildIdx(index))
+                ) {
+                    smallerChildIndex = this._getRightChildIdx(index);
                 }
 
-                if(leftChild < currentItem) {
-                    this._swapItems(idx,this._getLeftChildIdx(idx));
-                    return this._bubbleDown(this._getLeftChildIdx(idx));
+                if(this.item(index) < this.item(smallerChildIndex)) {
+                    break;
                 }
+                else {
+                    this._swapItems(index,smallerChildIndex);
+                }
+                index = smallerChildIndex;
             }
         }
+
+
     }
 
 
@@ -138,25 +156,24 @@ let Solution = (()=>{
          * position til we find its place on the heap
          * @param idx
          */
-        _bubbleDown(idx) {
-            if(this._hasLeftChild(idx)) {
-                let currentItem = this.data[idx];
-                let leftChild = this.data[this._getLeftChildIdx(idx)];
+        _bubbleDown() {
+            let index = 0;
+            while(this._hasLeftChild(index)) {
+                let smallerChildIndex = this._getLeftChildIdx(index);
 
-                if(this._hasRightChild(idx)) {
-                    let rightChild = this.data[this._getRightChildIdx(idx)];
-                    if(rightChild > leftChild) {
-                        if(rightChild > currentItem) {
-                            this._swapItems(idx,this._getRightChildIdx(idx));
-                            return this._bubbleDown(this._getRightChildIdx(idx));
-                        }
-                    }
+                if( this._hasRightChild(index)
+                    && this.item(this._getRightChildIdx(index)) > this.item(this._getLeftChildIdx(index))
+                ) {
+                    smallerChildIndex = this._getRightChildIdx(index);
                 }
 
-                if(leftChild > currentItem) {
-                    this._swapItems(idx,this._getLeftChildIdx(idx));
-                    return this._bubbleDown(this._getLeftChildIdx(idx));
+                if(this.item(index) > this.item(smallerChildIndex)) {
+                    break;
                 }
+                else {
+                    this._swapItems(index,smallerChildIndex);
+                }
+                index = smallerChildIndex;
             }
         }
     }
@@ -174,21 +191,20 @@ let Solution = (()=>{
 
         getMiddle() {
             let middle;
-
-            if(this.minHeap.count() === this.maxHeap.count()){
-                let highestMin = this.maxHeap.peek();
-                let lowestMax = this.minHeap.peek();
+            if(this.minHeap.count === this.maxHeap.count){
+                let highestMin = this.maxHeap.peek;
+                let lowestMax = this.minHeap.peek;
                 middle = (highestMin+lowestMax) / 2;
-            }else if(this.minHeap.count() > this.maxHeap.count()){
-                middle = this.minHeap.peek();
-            }else if(this.minHeap.count() < this.maxHeap.count()){
-                middle = this.maxHeap.peek();
+            }else if(this.minHeap.count > this.maxHeap.count){
+                middle = this.minHeap.peek;
+            }else if(this.minHeap.count < this.maxHeap.count){
+                middle = this.maxHeap.peek;
             }
             return middle.toFixed(1);
         }
 
         rebalanceHeaps() {
-            if (this.minHeap.count() < this.maxHeap.count()) {
+            if (this.minHeap.count < this.maxHeap.count) {
                 this.minHeap.add(this.maxHeap.poll());
             } else {
                 this.maxHeap.add(this.minHeap.poll());
@@ -196,13 +212,13 @@ let Solution = (()=>{
         }
 
         add(item) {
-            if(item >= this.minHeap.peek()){
-                this.minHeap.add(item);
-            }else{
+            if(this.minHeap.count === 0 || item < this.maxHeap.peek){
                 this.maxHeap.add(item);
+            }else{
+                this.minHeap.add(item);
             }
 
-            if(Math.abs(this.minHeap.count() - this.maxHeap.count()) > 1){
+            if(Math.abs(this.minHeap.count - this.maxHeap.count) > 1){
                 this.rebalanceHeaps();
             }
         }
@@ -215,7 +231,9 @@ let Solution = (()=>{
 
 /////////////// ignore above this line ////////////////////
 
-let test1 = (() => {
+
+let test0 = (() => {
+
     var input = require("fs")
             .readFileSync("./tests/heaps_find_the_running_median_test_1.txt", "utf-8")
             .split("\n");
@@ -230,22 +248,6 @@ let test1 = (() => {
     for(var a_i = 0; a_i < n; a_i++){
         s.add(Number(input[a_i]));
 
-
-        var tmp = s.minHeap.data[0];
-        for(var i = 1; i< s.minHeap.count(); i++){
-            if(s.minHeap.data[i] < tmp){
-                throw new Error(s.minHeap.data[i]+' < '+tmp);
-            }
-        }
-
-        tmp = s.maxHeap.data[0];
-        for(var i = 1; i< s.maxHeap.count(); i++){
-            if(s.maxHeap.data[i] > tmp){
-                throw new Error(s.minHeap.data[i]+' > '+tmp);
-            }
-        }
-
-
         try {
             console.assert(s.getMiddle() == results[a_i], 'at position '+a_i+': '+s.getMiddle() +' != '+ results[a_i]);
         }catch(e){
@@ -254,4 +256,176 @@ let test1 = (() => {
             break;
         }
     }
+})();
+
+
+let test1 = (() => {
+
+    var input = require("fs")
+        .readFileSync("./tests/heaps_find_the_running_median_test_1.txt", "utf-8")
+        .split("\n");
+
+    var results = require("fs")
+        .readFileSync("./tests/heaps_find_the_running_median_test_1_results.txt", "utf-8")
+        .split("\n");
+
+    var s = new Solution();
+    var n = input.shift();
+
+
+
+    for(var a_i = 0; a_i < n; a_i++){
+        s.maxHeap.add(Number(input[a_i]));
+        s.minHeap.add(Number(input[a_i]));
+    }
+
+    // testing add()
+    var tmp = s.minHeap.peek;
+    for(var i = 1; i< s.minHeap.count; i++){
+        if(s.minHeap.data[i] < tmp){
+            throw new Error(s.minHeap.data[i]+' < '+tmp);
+        }
+    }
+    tmp = s.maxHeap.peek;
+    for(var i = 1; i< s.maxHeap.count; i++){
+        if(s.maxHeap.data[i] > tmp){
+            throw new Error(s.maxHeap.data[i]+' > '+tmp);
+        }
+    }
+
+    // testing poll() on minHeap
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.add(999999);
+    s.minHeap.poll();
+    s.minHeap.add(271);
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    s.minHeap.poll();
+    console.log(s.minHeap.peek);
+    tmp = s.minHeap.peek;
+    for(var i = 1; i< s.minHeap.count; i++){
+        if(s.minHeap.data[i] < tmp){
+            throw new Error(s.minHeap.data[i]+' < '+tmp);
+        }
+    }
+
+
+
+    // testing poll() on maxHeap
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.add(1);
+    s.maxHeap.poll();
+    s.maxHeap.add(99999);
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    s.maxHeap.poll();
+    console.log(s.maxHeap.peek);
+    tmp = s.maxHeap.peek;
+    for(var i = 1; i< s.maxHeap.count; i++){
+        if(s.maxHeap.item(i) > tmp){
+            throw new Error(s.maxHeap.item(i)+' > '+tmp+' at i = '+i);
+        }
+    }
+
+})();
+
+
+
+
+
+
+
+let test2 = (() => {
+
+    var s = new Solution();
+
+    s.minHeap.add(50);
+    console.log('add(50)');
+    console.log([50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(10);
+    console.log('add(10)');
+    console.log([10,50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(15);
+    console.log('add(15)');
+    console.log([10,50,15]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(8);
+    console.log('add(8)');
+    console.log([8,10,15,50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(25);
+    console.log('add(25)');
+    console.log([8,10,15,50,25]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(10);
+    console.log('add(10)');
+    console.log([8,10,10,50,25,15]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.add(11);
+    console.log('add(11)');
+    console.log([8,10,10,50,25,15,11]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([10,11,10,50,25,15]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([10,11,15,50,25]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([11,25,15,50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([15,25,50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([25,50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([50]);
+    console.log(s.minHeap.data);
+
+    s.minHeap.poll();
+    console.log('poll()');
+    console.log([]);
+    console.log(s.minHeap.data);
+/*
+    var tmp = s.maxHeap.peek;
+    for(var i = 1; i< s.maxHeap.count; i++){
+        if(s.maxHeap.item(i) > tmp){
+            throw new Error(s.maxHeap.item(i)+' > '+tmp+' at i = '+i);
+        }
+    }
+*/
 })();
