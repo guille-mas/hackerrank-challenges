@@ -159,21 +159,21 @@ let Solution = (()=>{
         _bubbleDown() {
             let index = 0;
             while(this._hasLeftChild(index)) {
-                let smallerChildIndex = this._getLeftChildIdx(index);
+                let higherChildIndex = this._getLeftChildIdx(index);
 
                 if( this._hasRightChild(index)
                     && this.item(this._getRightChildIdx(index)) > this.item(this._getLeftChildIdx(index))
                 ) {
-                    smallerChildIndex = this._getRightChildIdx(index);
+                    higherChildIndex = this._getRightChildIdx(index);
                 }
 
-                if(this.item(index) > this.item(smallerChildIndex)) {
+                if(this.item(index) > this.item(higherChildIndex)) {
                     break;
                 }
                 else {
-                    this._swapItems(index,smallerChildIndex);
+                    this._swapItems(index,higherChildIndex);
                 }
-                index = smallerChildIndex;
+                index = higherChildIndex;
             }
         }
     }
@@ -189,7 +189,7 @@ let Solution = (()=>{
             this.maxHeap = new MaxHeap();
         }
 
-        getMiddle() {
+        get middle() {
             let middle;
             if(this.minHeap.count === this.maxHeap.count){
                 let highestMin = this.maxHeap.peek;
@@ -249,10 +249,10 @@ let test0 = (() => {
         s.add(Number(input[a_i]));
 
         try {
-            console.assert(s.getMiddle() == results[a_i], 'at position '+a_i+': '+s.getMiddle() +' != '+ results[a_i]);
+            console.assert(s.middle == results[a_i], 'at position '+a_i+': '+s.middle +' != '+ results[a_i]);
         }catch(e){
             console.log(e.message);
-            console.log(s.getMiddle(), results[a_i]);
+            console.log(s.middle, results[a_i]);
             break;
         }
     }
@@ -346,8 +346,8 @@ let test1 = (() => {
 
 
 
-
-let test2 = (() => {
+/*
+let minHeapTest = (() => {
 
     var s = new Solution();
 
@@ -420,12 +420,6 @@ let test2 = (() => {
     console.log('poll()');
     console.log([]);
     console.log(s.minHeap.data);
-/*
-    var tmp = s.maxHeap.peek;
-    for(var i = 1; i< s.maxHeap.count; i++){
-        if(s.maxHeap.item(i) > tmp){
-            throw new Error(s.maxHeap.item(i)+' > '+tmp+' at i = '+i);
-        }
-    }
-*/
+
 })();
+*/
