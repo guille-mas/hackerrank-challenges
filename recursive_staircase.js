@@ -7,8 +7,7 @@ let solution = (()=>{
     var memo = [];
 
     function findWaysToClimb(sHeight){
-        if(sHeight > 2){
-
+        if(sHeight > 1){
             if(typeof memo[sHeight] == 'undefined'){
                 if(typeof memo[sHeight-1] == 'undefined'){
                     memo[sHeight-1] = findWaysToClimb(sHeight-1);
@@ -23,40 +22,10 @@ let solution = (()=>{
             }
 
             return memo[sHeight];
-
-        }else if(sHeight > 1){
-
-            if(typeof memo[sHeight] == 'undefined'){
-                if(typeof memo[sHeight-1] == 'undefined'){
-                    memo[sHeight-1] = findWaysToClimb(sHeight-1);
-                }
-                if(typeof memo[sHeight-2] == 'undefined'){
-                    memo[sHeight-2] = findWaysToClimb(sHeight-2);
-                }
-                memo[sHeight] = memo[sHeight-1] + memo[sHeight-2];
-            }
-
-            return memo[sHeight];
-
-        }else if(sHeight > 0){
-
-            if(typeof memo[sHeight] == 'undefined'){
-                if(typeof memo[sHeight-1] == 'undefined'){
-                    memo[sHeight-1] = findWaysToClimb(sHeight-1);
-                }
-                memo[sHeight] = memo[sHeight-1];
-            }
-
-            return memo[sHeight];
-
         }else if(sHeight == 0){
-
             return 1;
-
         }else{
-
             return 0;
-
         }
     }
 
@@ -70,6 +39,9 @@ let solution = (()=>{
     return solve;
 })();
 
+console.log(solution(1));
+console.log(solution(4));
+console.log(solution(7));
 
 console.log(solution(10));
 console.log(solution(20));
