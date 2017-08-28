@@ -9,20 +9,32 @@ let Trie = (()=>{
      * Trie "class" implementation
      */
     function Trie(char) {
+        // the key of each child is a char
+        // this.childs['a'].data should be 'a'
         this.childs = {};
+        // the char stored on this node
         this.data = char;
+        // memoization of the number of suffix for this node
         this.suffixCounter = 0;
     };
 
 
     /**
      * Add a word to the trie
+     * and update all related suffixCounter
+     * to avoid recomputing them at Trie.prototype.countWordsWithPrefix
+     * (recursion + memoization)
      * @param word
      */
     Trie.prototype.addWord = function(word) {
         if(!word.length) {
+            // base case, after removing
+            // all chars from the original word
             return 0;
         }else if(!this.data.length) {
+            // Base case 2: A leaf is reached
+            // and we still have chars from the original word
+            // to store into the try
             if(typeof this.childs[word[0]] == 'undefined') {
                 this.childs[word[0]] = new Trie(word[0]);
             }
@@ -30,19 +42,30 @@ let Trie = (()=>{
             this.suffixCounter += 1;
             return this.suffixCounter;
         } else {
+            // Two other cases:
+            //      1. we got only one char left on our word
+            //      2. we got more then one char left,
+            //         so we keep going deeper into the Trie
+
+            // This line might be resaving the same value into
+            // this node. But it does not harm since it's O(1)
             this.data = word[0];
+
             if(word.length == 1) {
-                // this is the end of a word
+                // Case 1
+                // this is the end of a word,
+                // update the memoized suffix counter
                 this.suffixCounter += 1;
             }else {
+                // Case 2
                 // here we are adding a word that is longer than the current position
                 if(typeof this.childs[word[1]] == 'undefined') {
                     this.childs[word[1]] = new Trie(word[1]);
                 }
                 this.childs[word[1]].addWord(word.substr(1));
+                // update the memoized suffix counter
                 this.suffixCounter += 1;
             }
-
             return this.suffixCounter;
         }
     };
@@ -51,7 +74,12 @@ let Trie = (()=>{
     /**
      * Count the number of words prefixed by a given string
      * The count does also includes the given string if it
-     * exists in the trie
+     * exists in the trie.
+     *
+     * Since the suffix counters have been already updated,
+     * we avoid the need to go to each leaf to count the suffixes
+     * for the given word
+     *
      * @param word
      */
     Trie.prototype.countWordsWithPrefix = function(word) {
@@ -70,7 +98,11 @@ let Trie = (()=>{
 })();
 
 
-function test1(){
+
+
+//-----------------TESTS BELOW---------------------------------
+
+function test(){
     "use strict";
     process.stdout.write("Test 1 running...\n");
 

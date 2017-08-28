@@ -48,4 +48,8 @@ let Solver = (()=>{
     return solver;
 })();
 
+
+
+//-----------------------TEST BELOW------------------------
+
 (new Solver()).solve([3,2,1]);

@@ -5,6 +5,9 @@ function findLonelyInt(a) {
     },null);
 }
 
+
+//-----------TEST BELOW-------------------
+
 let a = [1,1,2];
 
 console.log(findLonelyInt(a));
